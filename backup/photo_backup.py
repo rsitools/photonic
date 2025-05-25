@@ -1,11 +1,12 @@
 # backup/photo_backup.py
-# CLI entry point for staged photo backup with planning, reporting, and execution
+# CLI entry point for Photonic: safe, structured photo backup with skip-dupe default
 
 import argparse
+import sys
 from pathlib import Path
-from lib.file_utils import is_hidden_or_system_file, get_file_type
-from lib.metadata_utils import extract_camera_model, extract_date_taken, ensure_exiftool
-from lib.path_utils import get_target_path
+from backup.lib.file_utils import is_hidden_or_system_file, get_file_type
+from backup.lib.metadata_utils import extract_camera_model, extract_date_taken, ensure_exiftool
+from backup.lib.path_utils import get_target_path
 import shutil
 import os
 
@@ -69,12 +70,37 @@ def execute_actions(actions: list[dict], target_root: Path, skip_dupe: bool):
             print(f"❌ error: {e}")
 
 
+def str_to_bool(v: str) -> bool:
+    return v.lower() in ("true", "yes", "1")
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Photo backup tool (staged)")
-    parser.add_argument("--source", required=True, help="Source folder or volume")
-    parser.add_argument("--target", required=True, help="Target folder or volume")
-    parser.add_argument("--skip-dupe", action="store_true", help="Skip files if name already exists in target")
+    parser = argparse.ArgumentParser(
+        description="PhotonKit – safely organize and manage your camera photos."
+    )
+    parser.add_argument(
+        "--source", required=True,
+        help="Path to the source folder or volume (e.g., SD card)"
+    )
+    parser.add_argument(
+        "--target", required=True,
+        help="Path to the backup folder or volume (e.g., external drive)"
+    )
+    parser.add_argument(
+        "--skip-dupe", default="true",
+        help=(
+            "(default) true, skip files that already exist in target. "
+            "false allows duplicates (IMG_1234-1.jpg, etc)."
+        )
+    )
+
+    # Show help if no arguments are passed
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(0)
+
     args = parser.parse_args()
+    skip_dupe = str_to_bool(args.skip_dupe)
 
     source = Path(args.source).expanduser().resolve()
     target = Path(args.target).expanduser().resolve()
@@ -90,7 +116,7 @@ def main():
         print("📤 Indexing target...")
         target_filenames = build_target_index(target)
         print("📦 Planning...")
-        actions = plan_actions(source_files, target_filenames, args.skip_dupe)
+        actions = plan_actions(source_files, target_filenames, skip_dupe)
 
         total = len(actions)
         to_copy = sum(1 for a in actions if a["action"] == "copy")
@@ -100,7 +126,7 @@ def main():
         print(f"  ➤ To copy : {to_copy}")
         print(f"  ➤ Skipped : {skipped}\n")
 
-        execute_actions(actions, target, args.skip_dupe)
+        execute_actions(actions, target, skip_dupe)
 
     except KeyboardInterrupt:
         print("\n🛑 Interrupted by user. Exiting cleanly.")

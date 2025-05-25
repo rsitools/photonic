@@ -1,16 +1,19 @@
-# 📸 Photonic
+# 📸 PhotonKit
 
-**Photonic** is a smart backup tool that helps you copy and organize your photos and videos from memory cards, phones, or cameras into your main storage drive — automatically grouped by date and camera.
+**PhotonKit** is a mildly opinionated backup tool that helps you copy and organize your photos and videos from memory cards, phones, or cameras into your main storage drive — automatically grouped by date and camera.
+
+It is opinionated in that it assumes and imposes a directory structure and processing rules. It uses EXIF data in photos to organize content into folders like `2025/2025-05-24/camera-name/`.
+
 
 ---
 
-## ✅ What Photonic Does
+## ✅ What PhotonKit Does
 
-- Copies your photos/videos into folders like this:
+- Copies your photos/videos into target folders in the following structure:
 
 ```
 
-YourStorageDrive/
+YourTargetStorageDrive/
 └── 2025/
   └── 2025-05-24/
     └── canon-eos-r5/
@@ -30,9 +33,9 @@ YourStorageDrive/
 
 ---
 
-## 🚀 How to Use It
+## 🚀 How to Run
 
-### 1. Make sure ExifTool is installed
+### 1. Make sure ExifTool is installed (once)
 
 Open Terminal and run:
 
@@ -47,34 +50,50 @@ Replace the folder paths below with your actual source and target:
 ```bash
 python backup/photo_backup.py \
   --source "/Volumes/SDCARD" \
-  --target "/Volumes/PhotoDrive" \
-  --skip-dupe
+  --target "/Volumes/PhotoDrive"
 ```
 
 * `--source`: the folder or memory card where your photos are
 * `--target`: your main backup drive
-* `--skip-dupe`: skips files that are already there
+
+✅ By default, PhotonKit skips duplicates — great for safely resuming interrupted backups.
+
+
+## 🗃 To Allow Duplicate Renaming
+
+To allow multiple versions of a file (e.g., IMG_1234.jpg, IMG_1234-1.jpg), explicitly set:
+
+```bash
+python backup/photo_backup.py \
+  --source "/Volumes/SDCARD" \
+  --target "/Volumes/PhotoDrive" \
+  --skip-dupe false
+```
+
 
 ---
 
-## 🔄 You Can Restart Anytime
+## 🔄 Resume Backups Anytime
 
-If something goes wrong or you unplug the drive, just run the same command again with `--skip-dupe`. Photonic will:
+If something crashes or you unplug a drive — just run the same command again. PhotonKit will:
 
-* Skip the files it already copied
-* Only copy what’s missing
+✅ Skip files it already copied
+✅ Continue copying only new files
+
+
 
 ---
 
 ## 🧼 Safe by Design
 
-* Doesn't overwrite files
-* Keeps your photos in neat folders by **date and camera**
-* Works great with both Mac Finder and Lightroom
+* Never overwrites files
+* Skips system/hidden files
+* Uses real photo metadata to organize folders
+* Friendly with Finder, Lightroom, and other workflows
 
 ---
 
-## 🧠 Why Use Photonic?
+## 🧠 Why Use PhotonKit?
 
 If you've ever thought:
 
@@ -90,16 +109,11 @@ Photonic does the organizing for you.
 
 * A preview mode (dry-run)
 * Logging of what was copied
-* Optional desktop app
 
 ---
 
 Made with ❤️ for photo wranglers.
 
-```
+## 🪪 License
 
-Let me know if you'd like:
-- A separate printable “quick start” card
-- An AppleScript shortcut wrapper
-- A SwiftUI drag-and-drop GUI for Photonic
-
+Photonic is released under the [MIT License](LICENSE).
