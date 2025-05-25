@@ -12,11 +12,11 @@
 
 YourStorageDrive/
 └── 2025/
-└── 2025-05-24/
-└── canon-eos-r5/
-├── jpg/
-├── raw/
-└── video/
+  └── 2025-05-24/
+    └── canon-eos-r5/
+        ├── jpg/
+        ├── raw/
+        └── video/
 
 ```
 
