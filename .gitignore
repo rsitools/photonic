@@ -1,3 +1,6 @@
+# OSX
+.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -129,9 +132,11 @@ celerybeat.pid
 
 # Environments
 .env
+.env*
 .venv
 env/
-venv/
+#venv*/
+.venv*/
 ENV/
 env.bak/
 venv.bak/
@@ -172,3 +177,9 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Ignore video and audio files
+*.mp4
+*.mp3
+*.mov
+*.webm
